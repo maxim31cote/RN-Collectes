@@ -1,0 +1,39 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "RN-Collectes - Sélectionner votre rue",
+        "description": "Choisissez votre rue dans la liste",
+        "data": {
+          "street": "Rue / Voie publique"
+        },
+        "data_description": {
+          "street": "Sélectionnez votre rue ({num_streets} rues disponibles)"
+        }
+      },
+      "civic_number": {
+        "title": "Numéro civique",
+        "description": "Entrez votre numéro civique pour {street}",
+        "data": {
+          "civic_number": "Numéro civique"
+        }
+      },
+      "manual": {
+        "title": "Saisie manuelle",
+        "description": "Entrez votre adresse manuellement",
+        "data": {
+          "street": "Rue / Voie publique",
+          "civic_number": "Numéro civique"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Impossible de se connecter au service",
+      "invalid_address": "Adresse invalide ou aucune donnée disponible",
+      "unknown": "Erreur inattendue"
+    },
+    "abort": {
+      "already_configured": "Cette adresse est déjà configurée"
+    }
+  }
+}

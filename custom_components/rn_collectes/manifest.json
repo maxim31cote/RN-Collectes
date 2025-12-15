@@ -1,0 +1,11 @@
+{
+  "domain": "rn_collectes",
+  "name": "RN-Collectes",
+  "codeowners": ["@custom"],
+  "config_flow": true,
+  "documentation": "https://github.com/custom/rouyn_noranda_collectes",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/custom/rouyn_noranda_collectes/issues",
+  "requirements": ["icalendar>=5.0.0", "recurring-ical-events>=2.0.0"],
+  "version": "1.0.0"
+}
