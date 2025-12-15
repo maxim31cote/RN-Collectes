@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 import logging
 
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
@@ -54,8 +55,9 @@ class CollectesCalendar(CoordinatorEntity, CalendarEntity):
         if not all_events:
             return None
 
-        # Trouver le prochain événement
-        now = datetime.now()
+        # Trouver le prochain événement (utiliser le fuseau horaire de Rouyn-Noranda)
+        tz = ZoneInfo("America/Toronto")
+        now = datetime.now(tz)
         for event_data in all_events:
             if event_data['date'] >= now:
                 return CalendarEvent(

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 import re
 import aiohttp
 from icalendar import Calendar
@@ -159,8 +160,11 @@ class CollectesCollector:
         try:
             calendar = Calendar.from_ical(ics_content)
             
+            # Utiliser le fuseau horaire de Rouyn-Noranda (America/Toronto)
+            tz = ZoneInfo("America/Toronto")
+            
             # Obtenir les événements des 365 prochains jours
-            start_date = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+            start_date = datetime.now(tz).replace(hour=0, minute=0, second=0, microsecond=0)
             end_date = start_date + timedelta(days=365)
             
             events = recurring_ical_events.of(calendar).between(start_date, end_date)
@@ -173,11 +177,14 @@ class CollectesCollector:
                 summary = str(event.get('SUMMARY', ''))
                 dtstart = event.get('DTSTART').dt
                 
-                # Convertir en datetime si c'est une date
+                # Convertir en datetime avec le fuseau horaire approprié
                 if isinstance(dtstart, datetime):
                     event_date = dtstart
+                    if event_date.tzinfo is None:
+                        event_date = event_date.replace(tzinfo=tz)
                 else:
-                    event_date = datetime.combine(dtstart, datetime.min.time())
+                    # Si c'est une date (sans heure), créer un datetime à minuit dans le fuseau horaire local
+                    event_date = datetime.combine(dtstart, datetime.min.time()).replace(tzinfo=tz)
                 
                 event_data = {
                     'date': event_date,

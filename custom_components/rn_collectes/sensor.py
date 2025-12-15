@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 import logging
 
 from homeassistant.components.sensor import SensorEntity
@@ -73,8 +74,9 @@ class CollecteSensor(CoordinatorEntity, SensorEntity):
         if not collectes:
             return None
 
-        # Trouver la prochaine collecte
-        now = datetime.now()
+        # Trouver la prochaine collecte (utiliser le fuseau horaire de Rouyn-Noranda)
+        tz = ZoneInfo("America/Toronto")
+        now = datetime.now(tz)
         for collecte in collectes:
             if collecte['date'] >= now:
                 return collecte['date'].strftime('%Y-%m-%d')
@@ -92,7 +94,9 @@ class CollecteSensor(CoordinatorEntity, SensorEntity):
         if not collectes:
             return {}
 
-        now = datetime.now()
+        # Utiliser le fuseau horaire de Rouyn-Noranda
+        tz = ZoneInfo("America/Toronto")
+        now = datetime.now(tz)
         next_collecte = None
         jours_restants = None
 
