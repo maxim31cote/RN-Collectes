@@ -100,10 +100,20 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
         
         if user_input is not None:
+            # L'utilisateur sélectionne le numéro affiché, mais on doit récupérer la vraie valeur
+            displayed_number = user_input["civic_number"]
+            
+            # Si on a notre mapping, récupérer la vraie valeur
+            if hasattr(self, "_civic_mapping") and displayed_number in self._civic_mapping:
+                civic_value = self._civic_mapping[displayed_number]
+            else:
+                # Fallback: utiliser le numéro affiché
+                civic_value = displayed_number
+            
             # Combiner les données des deux étapes
             full_data = {
                 "street": self._selected_street,
-                "civic_number": user_input["civic_number"],
+                "civic_number": civic_value,  # Stocker la vraie valeur du formulaire
             }
             
             try:
@@ -119,15 +129,21 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return self.async_create_entry(title=info["title"], data=full_data)
 
         # Essayer de récupérer les numéros civiques pour cette rue
-        civic_numbers = await CollectesCollector.async_get_civic_numbers(self._selected_street)
+        civic_numbers_dict = await CollectesCollector.async_get_civic_numbers(self._selected_street)
         
-        if civic_numbers:
+        if civic_numbers_dict:
+            # Stocker le mapping pour plus tard
+            self._civic_mapping = civic_numbers_dict
+            
+            # Utiliser les numéros affichés pour le dropdown
+            civic_numbers_list = list(civic_numbers_dict.keys())
+            
             # Si on a une liste, utiliser un sélecteur
             data_schema = vol.Schema(
                 {
                     vol.Required("civic_number"): SelectSelector(
                         SelectSelectorConfig(
-                            options=civic_numbers,
+                            options=civic_numbers_list,
                             mode=SelectSelectorMode.DROPDOWN,
                         )
                     ),
