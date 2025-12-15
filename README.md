@@ -14,17 +14,23 @@ Cette intégration permet de suivre les collectes de déchets, récupération, c
 
 ### HACS (Recommandé)
 
+[![Ajouter à HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=maxim31cote&repository=RN-Collectes&category=integration)
+
+**OU manuellement :**
+
 1. Ouvrez HACS dans Home Assistant
 2. Allez dans "Intégrations"
 3. Cliquez sur les trois points en haut à droite et sélectionnez "Dépôts personnalisés"
-4. Ajoutez ce dépôt comme intégration personnalisée
-5. Recherchez "Rouyn-Noranda Collectes" et installez-le
-6. Redémarrez Home Assistant
+4. Ajoutez l'URL : `https://github.com/maxim31cote/RN-Collectes`
+5. Sélectionnez la catégorie "Integration"
+6. Recherchez "RN-Collectes" et installez-le
+7. Redémarrez Home Assistant
 
 ### Installation manuelle
 
-1. Copiez le dossier `custom_components/rouyn_noranda_collectes` dans votre dossier `config/custom_components/`
-2. Redémarrez Home Assistant
+1. Téléchargez la dernière version depuis [GitHub](https://github.com/maxim31cote/RN-Collectes)
+2. Copiez le dossier `custom_components/rn_collectes` dans votre dossier `config/custom_components/`
+3. Redémarrez Home Assistant
 
 ## Configuration
 
