@@ -47,7 +47,9 @@ class CollecteSensor(CoordinatorEntity, SensorEntity):
         super().__init__(coordinator)
         self.collecte_type = collecte_type
         self._entry = entry
-        self._attr_name = collecte_type
+        # Utiliser le numéro affiché pour distinguer plusieurs adresses
+        displayed_number = entry.data.get("displayed_number", entry.data.get("civic_number", ""))
+        self._attr_name = f"{displayed_number} - {collecte_type}"
         self._attr_unique_id = f"{entry.entry_id}_{collecte_type.lower().replace(' ', '_')}"
         self._attr_icon = self._get_icon()
 

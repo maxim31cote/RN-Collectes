@@ -41,7 +41,9 @@ class CollectesCalendar(CoordinatorEntity, CalendarEntity):
         """Initialiser le calendrier."""
         super().__init__(coordinator)
         self._entry = entry
-        self._attr_name = "Calendrier"
+        # Utiliser le numéro affiché pour distinguer plusieurs adresses
+        displayed_number = entry.data.get("displayed_number", entry.data.get("civic_number", ""))
+        self._attr_name = f"{displayed_number} - Calendrier"
         self._attr_unique_id = f"{entry.entry_id}_calendar"
 
     @property
