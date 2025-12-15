@@ -137,7 +137,7 @@ class CollecteSensor(CoordinatorEntity, SensorEntity):
         """Retourner les informations du périphérique."""
         return {
             "identifiers": {(DOMAIN, self._entry.entry_id)},
-            "name": f"Collectes {self._entry.data['street']} {self._entry.data['civic_number']}",
+            "name": self._entry.title,
             "manufacturer": "Ville de Rouyn-Noranda",
             "model": "Calendrier de collectes",
         }
