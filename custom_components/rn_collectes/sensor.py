@@ -47,7 +47,7 @@ class CollecteSensor(CoordinatorEntity, SensorEntity):
         super().__init__(coordinator)
         self.collecte_type = collecte_type
         self._entry = entry
-        self._attr_name = f"{entry.title} - {collecte_type}"
+        self._attr_name = collecte_type
         self._attr_unique_id = f"{entry.entry_id}_{collecte_type.lower().replace(' ', '_')}"
         self._attr_icon = self._get_icon()
 
