@@ -53,8 +53,11 @@ class CollectesCollector:
                 return []
 
     @staticmethod
-    async def async_get_civic_numbers(street: str) -> list[str]:
-        """Récupérer la liste des numéros civiques pour une rue donnée."""
+    async def async_get_civic_numbers(street: str) -> dict[str, str]:
+        """Récupérer la liste des numéros civiques pour une rue donnée.
+        
+        Retourne un dictionnaire {numéro_affiché: value_formulaire}
+        """
         async with aiohttp.ClientSession() as session:
             try:
                 # Appeler l'API AJAX d'OctoberCMS pour obtenir les numéros civiques
@@ -78,22 +81,22 @@ class CollectesCollector:
                     # Extraire les numéros civiques du HTML retourné
                     html_content = result.get('addressPicker::dropdown_civic', '')
                     
-                    # Parser le HTML pour extraire les numéros civiques
-                    pattern = r'<option value="[^"]*"\s*>([^<]+)</option>'
+                    # Parser le HTML pour extraire value et texte
+                    pattern = r'<option value="([^"]*)"\s*>([^<]+)</option>'
                     matches = re.findall(pattern, html_content)
                     
-                    # Filtrer et nettoyer les numéros civiques
-                    civic_numbers = []
-                    for match in matches:
-                        match = match.strip()
-                        if match and match != "Saisir un no. civique":
-                            civic_numbers.append(match)
+                    # Créer un dictionnaire {numéro_affiché: value}
+                    civic_numbers = {}
+                    for value, text in matches:
+                        text = text.strip()
+                        if text and text != "Saisir un no. civique" and value:
+                            civic_numbers[text] = value
                     
                     return civic_numbers
                 
             except Exception as err:
                 _LOGGER.error("Erreur lors de la récupération des numéros civiques: %s", err)
-                return []
+                return {}
 
     async def async_get_collectes(self) -> dict[str, any]:
         """Récupérer les données de collecte."""
