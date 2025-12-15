@@ -41,8 +41,9 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
         _LOGGER.error("Erreur lors de la validation: %s", err)
         raise CannotConnect from err
 
-    # Retourner un titre pour l'intégration
-    return {"title": f"Collectes {data['street']} {data['civic_number']}"}
+    # Retourner un titre pour l'intégration (numéro affiché + rue)
+    displayed_number = data.get("displayed_number", data["civic_number"])
+    return {"title": f"{displayed_number} {data['street']}"}
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -114,6 +115,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             full_data = {
                 "street": self._selected_street,
                 "civic_number": civic_value,  # Stocker la vraie valeur du formulaire
+                "displayed_number": displayed_number,  # Garder le numéro affiché pour le titre
             }
             
             try:
