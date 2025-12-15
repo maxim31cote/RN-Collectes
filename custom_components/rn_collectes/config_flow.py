@@ -43,7 +43,7 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
 
     # Retourner un titre pour l'intégration (numéro affiché + rue)
     displayed_number = data.get("displayed_number", data["civic_number"])
-    return {"title": f"{displayed_number} {data['street']}"}
+    return {"title": f"Collectes au {displayed_number} {data['street']}"}
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
