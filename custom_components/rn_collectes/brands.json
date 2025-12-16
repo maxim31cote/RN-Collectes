@@ -1,0 +1,9 @@
+{
+  "domain": "rn_collectes",
+  "name": "RN-Collectes",
+  "integrations": {
+    "rn_collectes": {
+      "name": "RN-Collectes"
+    }
+  }
+}
