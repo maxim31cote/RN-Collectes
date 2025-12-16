@@ -189,7 +189,7 @@ variables:
     {% endif %}
   
   message: >
-    N'oublie pas de mettre {{ items_text }} au chemin pour {{ day_text }} !
+    N'oublie pas de mettre {{ items_text }} au chemin {{ day_text }} !
 
 trigger:
   - platform: time
