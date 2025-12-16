@@ -1,6 +1,6 @@
 {
   "domain": "rn_collectes",
-  "name": "RN-Collectes",
+  "name": "Collectes Rouyn-Noranda",
   "codeowners": ["@custom"],
   "config_flow": true,
   "documentation": "https://github.com/custom/rouyn_noranda_collectes",
