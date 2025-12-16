@@ -96,6 +96,26 @@ entities:
   - entity: sensor.prochaine_collecte_residus_verts
 ```
 
+## 📱 Blueprint de notification
+
+Un blueprint est disponible pour créer facilement des automatisations de notification avec messages personnalisés.
+
+[![Importer le blueprint](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fmaxim31cote%2FRN-Collectes%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Frn_collectes%2Fnotification_collecte.yaml)
+
+**Fonctionnalités du blueprint :**
+- ⏰ Heure de notification personnalisable
+- 📅 Choix du nombre de jours avant la collecte (0-7 jours)
+- ✅ Sélection des types de collecte à surveiller
+- 💬 Messages intelligents qui s'adaptent ("aujourd'hui", "demain", "dans X jours")
+- 📱 Support multi-appareils
+
+**Exemples de messages :**
+- `N'oublie pas de mettre le "Déchets" au chemin pour demain !`
+- `N'oublie pas de mettre les "Déchets et Récupération" au chemin pour aujourd'hui !`
+- `N'oublie pas de mettre les "Déchets, Récupération et Compost" au chemin pour dans 2 jours !`
+
+[Plus d'informations sur le blueprint](blueprints/README.md)
+
 ## Mise à jour des données
 
 Les données sont mises à jour automatiquement toutes les 12 heures. Vous pouvez forcer une mise à jour en rechargeant l'intégration.

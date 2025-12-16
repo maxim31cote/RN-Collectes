@@ -1,0 +1,174 @@
+blueprint:
+  name: Notification de Collecte RN-Collectes
+  description: >
+    Envoie une notification personnalisée pour rappeler les collectes à venir.
+    Le message s'adapte automatiquement selon le nombre de jours avant la collecte
+    (aujourd'hui, demain, ou dans X jours).
+  domain: automation
+  source_url: https://github.com/maxim31cote/RN-Collectes/blob/main/blueprints/automation/rn_collectes/notification_collecte.yaml
+  
+  input:
+    notification_time:
+      name: Heure de notification
+      description: L'heure à laquelle envoyer la notification
+      selector:
+        time:
+    
+    days_before:
+      name: Nombre de jours avant
+      description: Combien de jours avant la collecte envoyer la notification (0 = le jour même, 1 = la veille, etc.)
+      default: 1
+      selector:
+        number:
+          min: 0
+          max: 7
+          step: 1
+          mode: slider
+    
+    sensor_dechets:
+      name: Capteur Déchets (optionnel)
+      description: Sélectionner le capteur de déchets à surveiller
+      default: {}
+      selector:
+        entity:
+          filter:
+            - integration: rn_collectes
+              domain: sensor
+    
+    sensor_recuperation:
+      name: Capteur Récupération (optionnel)
+      description: Sélectionner le capteur de récupération à surveiller
+      default: {}
+      selector:
+        entity:
+          filter:
+            - integration: rn_collectes
+              domain: sensor
+    
+    sensor_compost:
+      name: Capteur Compost (optionnel)
+      description: Sélectionner le capteur de compost à surveiller
+      default: {}
+      selector:
+        entity:
+          filter:
+            - integration: rn_collectes
+              domain: sensor
+    
+    sensor_encombrants:
+      name: Capteur Encombrants (optionnel)
+      description: Sélectionner le capteur d'encombrants à surveiller
+      default: {}
+      selector:
+        entity:
+          filter:
+            - integration: rn_collectes
+              domain: sensor
+    
+    sensor_residus_verts:
+      name: Capteur Résidus verts (optionnel)
+      description: Sélectionner le capteur de résidus verts à surveiller
+      default: {}
+      selector:
+        entity:
+          filter:
+            - integration: rn_collectes
+              domain: sensor
+    
+    sensor_arbre_noel:
+      name: Capteur Arbre de Noël (optionnel)
+      description: Sélectionner le capteur d'arbres de Noël à surveiller
+      default: {}
+      selector:
+        entity:
+          filter:
+            - integration: rn_collectes
+              domain: sensor
+    
+    notify_service:
+      name: Service de notification
+      description: Le service de notification à utiliser (ex. notify.mobile_app_mon_telephone)
+      selector:
+        text:
+
+variables:
+  days_before_var: !input days_before
+  sensor_dechets_var: !input sensor_dechets
+  sensor_recuperation_var: !input sensor_recuperation
+  sensor_compost_var: !input sensor_compost
+  sensor_encombrants_var: !input sensor_encombrants
+  sensor_residus_verts_var: !input sensor_residus_verts
+  sensor_arbre_noel_var: !input sensor_arbre_noel
+  
+  day_text: >
+    {% if days_before_var == 0 %}
+      aujourd'hui
+    {% elif days_before_var == 1 %}
+      demain
+    {% else %}
+      dans {{ days_before_var }} jours
+    {% endif %}
+  
+  collectes_list: >
+    {% set ns = namespace(collectes=[]) %}
+    
+    {% if sensor_dechets_var != '' and state_attr(sensor_dechets_var, 'days_until') == days_before_var %}
+      {% set ns.collectes = ns.collectes + ['Déchets'] %}
+    {% endif %}
+    
+    {% if sensor_recuperation_var != '' and state_attr(sensor_recuperation_var, 'days_until') == days_before_var %}
+      {% set ns.collectes = ns.collectes + ['Récupération'] %}
+    {% endif %}
+    
+    {% if sensor_compost_var != '' and state_attr(sensor_compost_var, 'days_until') == days_before_var %}
+      {% set ns.collectes = ns.collectes + ['Compost'] %}
+    {% endif %}
+    
+    {% if sensor_encombrants_var != '' and state_attr(sensor_encombrants_var, 'days_until') == days_before_var %}
+      {% set ns.collectes = ns.collectes + ['Encombrants'] %}
+    {% endif %}
+    
+    {% if sensor_residus_verts_var != '' and state_attr(sensor_residus_verts_var, 'days_until') == days_before_var %}
+      {% set ns.collectes = ns.collectes + ['Résidus verts'] %}
+    {% endif %}
+    
+    {% if sensor_arbre_noel_var != '' and state_attr(sensor_arbre_noel_var, 'days_until') == days_before_var %}
+      {% set ns.collectes = ns.collectes + ['Arbre de Noël'] %}
+    {% endif %}
+    
+    {{ ns.collectes }}
+  
+  items_text: >
+    {% set items = collectes_list %}
+    {% if items | length == 1 %}
+      {{ items[0] }}
+    {% elif items | length == 2 %}
+      {{ items[0] }} et {{ items[1] }}
+    {% else %}
+      {{ items[:-1] | join(', ') }} et {{ items[-1] }}
+    {% endif %}
+  
+  pluriel: "{{ 's' if collectes_list | length > 1 else '' }}"
+  
+  message: >
+    N'oublie pas de mettre le{{ pluriel }} "{{ items_text }}" au chemin pour {{ day_text }} !
+
+trigger:
+  - platform: time
+    at: !input notification_time
+
+condition:
+  - condition: template
+    value_template: "{{ collectes_list | length > 0 }}"
+
+action:
+  - service: !input notify_service
+    data:
+      title: "🗑️ Rappel de Collecte"
+      message: "{{ message }}"
+      data:
+        notification_icon: mdi:delete-empty
+        tag: collecte_reminder
+        group: Collectes
+
+mode: single
