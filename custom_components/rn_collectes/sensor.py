@@ -130,6 +130,8 @@ class CollecteSensor(CoordinatorEntity, SensorEntity):
             'description': next_collecte['description'] if next_collecte else None,
             'prochaines_collectes': upcoming,
             'derniere_mise_a_jour': self.coordinator.data.get('last_update').isoformat() if self.coordinator.data.get('last_update') else None,
+            'integration': DOMAIN,
+            'days_until': jours_restants,
         }
 
     @property

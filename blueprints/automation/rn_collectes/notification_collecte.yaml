@@ -25,80 +25,65 @@ blueprint:
           step: 1
           mode: slider
     
-    sensor_dechets:
-      name: Capteur Déchets (optionnel)
-      description: Sélectionner le capteur de déchets à surveiller
-      default: {}
+    notify_dechets:
+      name: Notifier pour les Déchets
+      description: Activer les notifications pour la collecte des déchets
+      default: true
       selector:
-        entity:
-          filter:
-            - integration: rn_collectes
-              domain: sensor
+        boolean:
     
-    sensor_recuperation:
-      name: Capteur Récupération (optionnel)
-      description: Sélectionner le capteur de récupération à surveiller
-      default: {}
+    notify_recuperation:
+      name: Notifier pour la Récupération
+      description: Activer les notifications pour la collecte de récupération
+      default: true
       selector:
-        entity:
-          filter:
-            - integration: rn_collectes
-              domain: sensor
+        boolean:
     
-    sensor_compost:
-      name: Capteur Compost (optionnel)
-      description: Sélectionner le capteur de compost à surveiller
-      default: {}
+    notify_compost:
+      name: Notifier pour le Compost
+      description: Activer les notifications pour la collecte de compost
+      default: true
       selector:
-        entity:
-          filter:
-            - integration: rn_collectes
-              domain: sensor
+        boolean:
     
-    sensor_encombrants:
-      name: Capteur Encombrants (optionnel)
-      description: Sélectionner le capteur d'encombrants à surveiller
-      default: {}
+    notify_encombrants:
+      name: Notifier pour les Encombrants
+      description: Activer les notifications pour la collecte d'encombrants
+      default: false
       selector:
-        entity:
-          filter:
-            - integration: rn_collectes
-              domain: sensor
+        boolean:
     
-    sensor_residus_verts:
-      name: Capteur Résidus verts (optionnel)
-      description: Sélectionner le capteur de résidus verts à surveiller
-      default: {}
+    notify_residus_verts:
+      name: Notifier pour les Résidus verts
+      description: Activer les notifications pour la collecte de résidus verts
+      default: false
       selector:
-        entity:
-          filter:
-            - integration: rn_collectes
-              domain: sensor
+        boolean:
     
-    sensor_arbre_noel:
-      name: Capteur Arbre de Noël (optionnel)
-      description: Sélectionner le capteur d'arbres de Noël à surveiller
-      default: {}
+    notify_arbre_noel:
+      name: Notifier pour les Arbres de Noël
+      description: Activer les notifications pour la collecte d'arbres de Noël
+      default: false
       selector:
-        entity:
-          filter:
-            - integration: rn_collectes
-              domain: sensor
+        boolean:
     
-    notify_service:
-      name: Service de notification
-      description: Le service de notification à utiliser (ex. notify.mobile_app_mon_telephone)
+    notify_devices:
+      name: Appareils de notification
+      description: Sélectionner les appareils qui recevront les notifications
       selector:
-        text:
+        device:
+          multiple: true
+          filter:
+            integration: mobile_app
 
 variables:
   days_before_var: !input days_before
-  sensor_dechets_var: !input sensor_dechets
-  sensor_recuperation_var: !input sensor_recuperation
-  sensor_compost_var: !input sensor_compost
-  sensor_encombrants_var: !input sensor_encombrants
-  sensor_residus_verts_var: !input sensor_residus_verts
-  sensor_arbre_noel_var: !input sensor_arbre_noel
+  notify_dechets_var: !input notify_dechets
+  notify_recuperation_var: !input notify_recuperation
+  notify_compost_var: !input notify_compost
+  notify_encombrants_var: !input notify_encombrants
+  notify_residus_verts_var: !input notify_residus_verts
+  notify_arbre_noel_var: !input notify_arbre_noel
   
   day_text: >
     {% if days_before_var == 0 %}
@@ -112,28 +97,46 @@ variables:
   collectes_list: >
     {% set ns = namespace(collectes=[]) %}
     
-    {% if sensor_dechets_var != '' and state_attr(sensor_dechets_var, 'days_until') == days_before_var %}
-      {% set ns.collectes = ns.collectes + ['Déchets'] %}
+    {% if notify_dechets_var %}
+      {% set sensor = states.sensor | selectattr('attributes.integration', 'defined') | selectattr('attributes.integration', 'eq', 'rn_collectes') | selectattr('entity_id', 'search', 'dechets') | list %}
+      {% if sensor | length > 0 and state_attr(sensor[0].entity_id, 'days_until') == days_before_var %}
+        {% set ns.collectes = ns.collectes + ['Déchets'] %}
+      {% endif %}
     {% endif %}
     
-    {% if sensor_recuperation_var != '' and state_attr(sensor_recuperation_var, 'days_until') == days_before_var %}
-      {% set ns.collectes = ns.collectes + ['Récupération'] %}
+    {% if notify_recuperation_var %}
+      {% set sensor = states.sensor | selectattr('attributes.integration', 'defined') | selectattr('attributes.integration', 'eq', 'rn_collectes') | selectattr('entity_id', 'search', 'recuperation') | list %}
+      {% if sensor | length > 0 and state_attr(sensor[0].entity_id, 'days_until') == days_before_var %}
+        {% set ns.collectes = ns.collectes + ['Récupération'] %}
+      {% endif %}
     {% endif %}
     
-    {% if sensor_compost_var != '' and state_attr(sensor_compost_var, 'days_until') == days_before_var %}
-      {% set ns.collectes = ns.collectes + ['Compost'] %}
+    {% if notify_compost_var %}
+      {% set sensor = states.sensor | selectattr('attributes.integration', 'defined') | selectattr('attributes.integration', 'eq', 'rn_collectes') | selectattr('entity_id', 'search', 'compost') | list %}
+      {% if sensor | length > 0 and state_attr(sensor[0].entity_id, 'days_until') == days_before_var %}
+        {% set ns.collectes = ns.collectes + ['Compost'] %}
+      {% endif %}
     {% endif %}
     
-    {% if sensor_encombrants_var != '' and state_attr(sensor_encombrants_var, 'days_until') == days_before_var %}
-      {% set ns.collectes = ns.collectes + ['Encombrants'] %}
+    {% if notify_encombrants_var %}
+      {% set sensor = states.sensor | selectattr('attributes.integration', 'defined') | selectattr('attributes.integration', 'eq', 'rn_collectes') | selectattr('entity_id', 'search', 'encombrants') | list %}
+      {% if sensor | length > 0 and state_attr(sensor[0].entity_id, 'days_until') == days_before_var %}
+        {% set ns.collectes = ns.collectes + ['Encombrants'] %}
+      {% endif %}
     {% endif %}
     
-    {% if sensor_residus_verts_var != '' and state_attr(sensor_residus_verts_var, 'days_until') == days_before_var %}
-      {% set ns.collectes = ns.collectes + ['Résidus verts'] %}
+    {% if notify_residus_verts_var %}
+      {% set sensor = states.sensor | selectattr('attributes.integration', 'defined') | selectattr('attributes.integration', 'eq', 'rn_collectes') | selectattr('entity_id', 'search', 'residus_verts') | list %}
+      {% if sensor | length > 0 and state_attr(sensor[0].entity_id, 'days_until') == days_before_var %}
+        {% set ns.collectes = ns.collectes + ['Résidus verts'] %}
+      {% endif %}
     {% endif %}
     
-    {% if sensor_arbre_noel_var != '' and state_attr(sensor_arbre_noel_var, 'days_until') == days_before_var %}
-      {% set ns.collectes = ns.collectes + ['Arbre de Noël'] %}
+    {% if notify_arbre_noel_var %}
+      {% set sensor = states.sensor | selectattr('attributes.integration', 'defined') | selectattr('attributes.integration', 'eq', 'rn_collectes') | selectattr('entity_id', 'search', 'arbre_de_noel') | list %}
+      {% if sensor | length > 0 and state_attr(sensor[0].entity_id, 'days_until') == days_before_var %}
+        {% set ns.collectes = ns.collectes + ['Arbre de Noël'] %}
+      {% endif %}
     {% endif %}
     
     {{ ns.collectes }}
@@ -162,13 +165,16 @@ condition:
     value_template: "{{ collectes_list | length > 0 }}"
 
 action:
-  - service: !input notify_service
-    data:
-      title: "🗑️ Rappel de Collecte"
-      message: "{{ message }}"
-      data:
-        notification_icon: mdi:delete-empty
-        tag: collecte_reminder
-        group: Collectes
+  - repeat:
+      for_each: !input notify_devices
+      sequence:
+        - service: notify.mobile_app_{{ device_attr(repeat.item, 'name') | slugify }}
+          data:
+            title: "🗑️ Rappel de Collecte"
+            message: "{{ message }}"
+            data:
+              notification_icon: mdi:delete-empty
+              tag: collecte_reminder
+              group: Collectes
 
 mode: single

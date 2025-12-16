@@ -12,14 +12,15 @@ Ce blueprint permet de créer une automation qui envoie des notifications person
 
 - ⏰ **Heure personnalisable** : Choisissez l'heure de la notification
 - 📅 **Jours avant** : Configurez combien de jours avant la collecte vous voulez être notifié (0-7 jours)
-- ✅ **Sélection des types** : Activez/désactivez les notifications pour chaque type de collecte :
+- ✅ **Sélection des types** : Activez/désactivez les notifications pour chaque type de collecte avec des checkboxes :
   - Déchets
   - Récupération
   - Compost
   - Encombrants
   - Résidus verts
   - Arbre de Noël
-- 📱 **Multi-appareils** : Envoyez les notifications à plusieurs appareils
+- 🤖 **Détection automatique** : Les capteurs sont trouvés automatiquement, pas besoin de les sélectionner manuellement !
+- 📱 **Multi-appareils** : Sélectionnez plusieurs appareils dans une liste
 - 💬 **Messages intelligents** : Le message s'adapte automatiquement :
   - "aujourd'hui" si jour même
   - "demain" si la veille
@@ -51,10 +52,11 @@ Ce blueprint permet de créer une automation qui envoie des notifications person
 2. Configurez :
    - L'heure de notification (ex: 19:00)
    - Le nombre de jours avant (ex: 1 pour la veille)
-   - Les types de collecte à surveiller
-   - Les appareils qui recevront les notifications
-   - L'intégration RN-Collectes à surveiller
+   - Cochez les types de collecte à surveiller (Déchets, Récupération, Compost, etc.)
+   - Sélectionnez les appareils qui recevront les notifications dans la liste
 3. Sauvegardez l'automation
+
+**Note :** Les capteurs sont détectés automatiquement ! Le blueprint trouve tout seul les capteurs RN-Collectes qui contiennent "déchets", "récupération", etc. dans leur nom.
 
 ### Prérequis
 
