@@ -10,12 +10,11 @@ blueprint:
   input:
     collecte_address:
       name: Adresse à surveiller
-      description: Sélectionner l'adresse RN-Collectes à surveiller (sélectionner n'importe quel capteur de cette adresse)
+      description: Sélectionner l'adresse RN-Collectes à surveiller
       selector:
-        entity:
+        device:
           filter:
             - integration: rn_collectes
-              domain: sensor
     
     notification_time:
       name: Heure de notification
@@ -95,10 +94,6 @@ variables:
   notify_residus_verts_var: !input notify_residus_verts
   notify_arbre_noel_var: !input notify_arbre_noel
   
-  # Extraire le préfixe de l'adresse (le numéro civique)
-  address_prefix: >
-    {{ collecte_address_var.split('.')[1].split('_')[0] }}
-  
   day_text: >
     {% if days_before_var == 0 %}
       aujourd'hui
@@ -116,48 +111,48 @@ variables:
         {% if address_prefix in entity.entity_id and 'dechets' in entity.entity_id and state_attr(entity.entity_id, 'jours_restants') == days_before_var %}
           {% set ns.bacs = ns.bacs + ['Déchets'] %}
         {% endif %}
+      {% endfor %}device_entities(collecte_address_var) %}
+        {% if 'dechets' in entity and state_attr(entity, 'jours_restants') == days_before_var %}
+          {% set ns.bacs = ns.bacs + ['Déchets'] %}
+        {% endif %}
       {% endfor %}
     {% endif %}
     
     {% if notify_recuperation_var %}
-      {% for entity in states.sensor %}
-        {% if address_prefix in entity.entity_id and 'recuperation' in entity.entity_id and state_attr(entity.entity_id, 'jours_restants') == days_before_var %}
+      {% for entity in device_entities(collecte_address_var) %}
+        {% if 'recuperation' in entity and state_attr(entity, 'jours_restants') == days_before_var %}
           {% set ns.bacs = ns.bacs + ['Récupération'] %}
         {% endif %}
       {% endfor %}
     {% endif %}
     
     {% if notify_compost_var %}
-      {% for entity in states.sensor %}
-        {% if address_prefix in entity.entity_id and 'compost' in entity.entity_id and state_attr(entity.entity_id, 'jours_restants') == days_before_var %}
+      {% for entity in device_entities(collecte_address_var) %}
+        {% if 'compost' in entity and state_attr(entity, 'jours_restants') == days_before_var %}
           {% set ns.bacs = ns.bacs + ['Compost'] %}
         {% endif %}
       {% endfor %}
     {% endif %}
     
     {% if notify_encombrants_var %}
-      {% for entity in states.sensor %}
-        {% if address_prefix in entity.entity_id and 'encombrants' in entity.entity_id and state_attr(entity.entity_id, 'jours_restants') == days_before_var %}
+      {% for entity in device_entities(collecte_address_var) %}
+        {% if 'encombrants' in entity and state_attr(entity, 'jours_restants') == days_before_var %}
           {% set ns.autres = ns.autres + ['Encombrants'] %}
         {% endif %}
       {% endfor %}
     {% endif %}
     
     {% if notify_residus_verts_var %}
-      {% for entity in states.sensor %}
-        {% if address_prefix in entity.entity_id and 'residus_verts' in entity.entity_id and state_attr(entity.entity_id, 'jours_restants') == days_before_var %}
+      {% for entity in device_entities(collecte_address_var) %}
+        {% if 'residus_verts' in entity and state_attr(entity, 'jours_restants') == days_before_var %}
           {% set ns.autres = ns.autres + ['Résidus verts'] %}
         {% endif %}
       {% endfor %}
     {% endif %}
     
     {% if notify_arbre_noel_var %}
-      {% for entity in states.sensor %}
-        {% if address_prefix in entity.entity_id and 'arbre_de_noel' in entity.entity_id and state_attr(entity.entity_id, 'jours_restants') == days_before_var %}
-          {% set ns.autres = ns.autres + ['Arbre de Noël'] %}
-        {% endif %}
-      {% endfor %}
-    {% endif %}
+      {% for entity in device_entities(collecte_address_var) %}
+        {% if 'arbre_de_noel' in entity and state_attr(entity
     
     {{ {'bacs': ns.bacs, 'autres': ns.autres} }}
   
