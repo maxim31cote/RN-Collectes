@@ -98,45 +98,51 @@ variables:
     {% set ns = namespace(collectes=[]) %}
     
     {% if notify_dechets_var %}
-      {% set sensor = states.sensor | selectattr('attributes.integration', 'defined') | selectattr('attributes.integration', 'eq', 'rn_collectes') | selectattr('entity_id', 'search', 'dechets') | list %}
-      {% if sensor | length > 0 and state_attr(sensor[0].entity_id, 'days_until') == days_before_var %}
-        {% set ns.collectes = ns.collectes + ['Déchets'] %}
-      {% endif %}
+      {% for entity in states.sensor %}
+        {% if 'dechets' in entity.entity_id and state_attr(entity.entity_id, 'days_until') == days_before_var %}
+          {% set ns.collectes = ns.collectes + ['Déchets'] %}
+        {% endif %}
+      {% endfor %}
     {% endif %}
     
     {% if notify_recuperation_var %}
-      {% set sensor = states.sensor | selectattr('attributes.integration', 'defined') | selectattr('attributes.integration', 'eq', 'rn_collectes') | selectattr('entity_id', 'search', 'recuperation') | list %}
-      {% if sensor | length > 0 and state_attr(sensor[0].entity_id, 'days_until') == days_before_var %}
-        {% set ns.collectes = ns.collectes + ['Récupération'] %}
-      {% endif %}
+      {% for entity in states.sensor %}
+        {% if 'recuperation' in entity.entity_id and state_attr(entity.entity_id, 'days_until') == days_before_var %}
+          {% set ns.collectes = ns.collectes + ['Récupération'] %}
+        {% endif %}
+      {% endfor %}
     {% endif %}
     
     {% if notify_compost_var %}
-      {% set sensor = states.sensor | selectattr('attributes.integration', 'defined') | selectattr('attributes.integration', 'eq', 'rn_collectes') | selectattr('entity_id', 'search', 'compost') | list %}
-      {% if sensor | length > 0 and state_attr(sensor[0].entity_id, 'days_until') == days_before_var %}
-        {% set ns.collectes = ns.collectes + ['Compost'] %}
-      {% endif %}
+      {% for entity in states.sensor %}
+        {% if 'compost' in entity.entity_id and state_attr(entity.entity_id, 'days_until') == days_before_var %}
+          {% set ns.collectes = ns.collectes + ['Compost'] %}
+        {% endif %}
+      {% endfor %}
     {% endif %}
     
     {% if notify_encombrants_var %}
-      {% set sensor = states.sensor | selectattr('attributes.integration', 'defined') | selectattr('attributes.integration', 'eq', 'rn_collectes') | selectattr('entity_id', 'search', 'encombrants') | list %}
-      {% if sensor | length > 0 and state_attr(sensor[0].entity_id, 'days_until') == days_before_var %}
-        {% set ns.collectes = ns.collectes + ['Encombrants'] %}
-      {% endif %}
+      {% for entity in states.sensor %}
+        {% if 'encombrants' in entity.entity_id and state_attr(entity.entity_id, 'days_until') == days_before_var %}
+          {% set ns.collectes = ns.collectes + ['Encombrants'] %}
+        {% endif %}
+      {% endfor %}
     {% endif %}
     
     {% if notify_residus_verts_var %}
-      {% set sensor = states.sensor | selectattr('attributes.integration', 'defined') | selectattr('attributes.integration', 'eq', 'rn_collectes') | selectattr('entity_id', 'search', 'residus_verts') | list %}
-      {% if sensor | length > 0 and state_attr(sensor[0].entity_id, 'days_until') == days_before_var %}
-        {% set ns.collectes = ns.collectes + ['Résidus verts'] %}
-      {% endif %}
+      {% for entity in states.sensor %}
+        {% if 'residus_verts' in entity.entity_id and state_attr(entity.entity_id, 'days_until') == days_before_var %}
+          {% set ns.collectes = ns.collectes + ['Résidus verts'] %}
+        {% endif %}
+      {% endfor %}
     {% endif %}
     
     {% if notify_arbre_noel_var %}
-      {% set sensor = states.sensor | selectattr('attributes.integration', 'defined') | selectattr('attributes.integration', 'eq', 'rn_collectes') | selectattr('entity_id', 'search', 'arbre_de_noel') | list %}
-      {% if sensor | length > 0 and state_attr(sensor[0].entity_id, 'days_until') == days_before_var %}
-        {% set ns.collectes = ns.collectes + ['Arbre de Noël'] %}
-      {% endif %}
+      {% for entity in states.sensor %}
+        {% if 'arbre_de_noel' in entity.entity_id and state_attr(entity.entity_id, 'days_until') == days_before_var %}
+          {% set ns.collectes = ns.collectes + ['Arbre de Noël'] %}
+        {% endif %}
+      {% endfor %}
     {% endif %}
     
     {{ ns.collectes }}
