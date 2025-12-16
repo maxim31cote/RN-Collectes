@@ -50,13 +50,14 @@ Ce blueprint permet de créer une automation qui envoie des notifications person
 
 1. Créez une nouvelle automation basée sur ce blueprint
 2. Configurez :
+   - **Adresse** : Sélectionnez n'importe quel capteur de l'adresse à surveiller (si vous avez plusieurs adresses configurées)
    - L'heure de notification (ex: 19:00)
    - Le nombre de jours avant (ex: 1 pour la veille)
    - Cochez les types de collecte à surveiller (Déchets, Récupération, Compost, etc.)
    - Sélectionnez les appareils qui recevront les notifications dans la liste
 3. Sauvegardez l'automation
 
-**Note :** Les capteurs sont détectés automatiquement ! Le blueprint trouve tout seul les capteurs RN-Collectes qui contiennent "déchets", "récupération", etc. dans leur nom.
+**Note :** Les capteurs sont détectés automatiquement pour l'adresse choisie ! Si vous avez plusieurs adresses, créez une automation par adresse.
 
 ### Prérequis
 

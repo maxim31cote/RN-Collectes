@@ -8,6 +8,15 @@ blueprint:
   source_url: https://github.com/maxim31cote/RN-Collectes/blob/main/blueprints/automation/rn_collectes/notification_collecte.yaml
   
   input:
+    collecte_address:
+      name: Adresse à surveiller
+      description: Sélectionner l'adresse RN-Collectes à surveiller (sélectionner n'importe quel capteur de cette adresse)
+      selector:
+        entity:
+          filter:
+            - integration: rn_collectes
+              domain: sensor
+    
     notification_time:
       name: Heure de notification
       description: L'heure à laquelle envoyer la notification
@@ -77,6 +86,7 @@ blueprint:
             integration: mobile_app
 
 variables:
+  collecte_address_var: !input collecte_address
   days_before_var: !input days_before
   notify_dechets_var: !input notify_dechets
   notify_recuperation_var: !input notify_recuperation
@@ -84,6 +94,10 @@ variables:
   notify_encombrants_var: !input notify_encombrants
   notify_residus_verts_var: !input notify_residus_verts
   notify_arbre_noel_var: !input notify_arbre_noel
+  
+  # Extraire le préfixe de l'adresse (le numéro civique)
+  address_prefix: >
+    {{ collecte_address_var.split('.')[1].split('_')[0] }}
   
   day_text: >
     {% if days_before_var == 0 %}
@@ -95,72 +109,92 @@ variables:
     {% endif %}
   
   collectes_list: >
-    {% set ns = namespace(collectes=[]) %}
+    {% set ns = namespace(bacs=[], autres=[]) %}
     
     {% if notify_dechets_var %}
       {% for entity in states.sensor %}
-        {% if 'dechets' in entity.entity_id and state_attr(entity.entity_id, 'jours_restants') == days_before_var %}
-          {% set ns.collectes = ns.collectes + ['Déchets'] %}
+        {% if address_prefix in entity.entity_id and 'dechets' in entity.entity_id and state_attr(entity.entity_id, 'jours_restants') == days_before_var %}
+          {% set ns.bacs = ns.bacs + ['Déchets'] %}
         {% endif %}
       {% endfor %}
     {% endif %}
     
     {% if notify_recuperation_var %}
       {% for entity in states.sensor %}
-        {% if 'recuperation' in entity.entity_id and state_attr(entity.entity_id, 'jours_restants') == days_before_var %}
-          {% set ns.collectes = ns.collectes + ['Récupération'] %}
+        {% if address_prefix in entity.entity_id and 'recuperation' in entity.entity_id and state_attr(entity.entity_id, 'jours_restants') == days_before_var %}
+          {% set ns.bacs = ns.bacs + ['Récupération'] %}
         {% endif %}
       {% endfor %}
     {% endif %}
     
     {% if notify_compost_var %}
       {% for entity in states.sensor %}
-        {% if 'compost' in entity.entity_id and state_attr(entity.entity_id, 'jours_restants') == days_before_var %}
-          {% set ns.collectes = ns.collectes + ['Compost'] %}
+        {% if address_prefix in entity.entity_id and 'compost' in entity.entity_id and state_attr(entity.entity_id, 'jours_restants') == days_before_var %}
+          {% set ns.bacs = ns.bacs + ['Compost'] %}
         {% endif %}
       {% endfor %}
     {% endif %}
     
     {% if notify_encombrants_var %}
       {% for entity in states.sensor %}
-        {% if 'encombrants' in entity.entity_id and state_attr(entity.entity_id, 'jours_restants') == days_before_var %}
-          {% set ns.collectes = ns.collectes + ['Encombrants'] %}
+        {% if address_prefix in entity.entity_id and 'encombrants' in entity.entity_id and state_attr(entity.entity_id, 'jours_restants') == days_before_var %}
+          {% set ns.autres = ns.autres + ['Encombrants'] %}
         {% endif %}
       {% endfor %}
     {% endif %}
     
     {% if notify_residus_verts_var %}
       {% for entity in states.sensor %}
-        {% if 'residus_verts' in entity.entity_id and state_attr(entity.entity_id, 'jours_restants') == days_before_var %}
-          {% set ns.collectes = ns.collectes + ['Résidus verts'] %}
+        {% if address_prefix in entity.entity_id and 'residus_verts' in entity.entity_id and state_attr(entity.entity_id, 'jours_restants') == days_before_var %}
+          {% set ns.autres = ns.autres + ['Résidus verts'] %}
         {% endif %}
       {% endfor %}
     {% endif %}
     
     {% if notify_arbre_noel_var %}
       {% for entity in states.sensor %}
-        {% if 'arbre_de_noel' in entity.entity_id and state_attr(entity.entity_id, 'jours_restants') == days_before_var %}
-          {% set ns.collectes = ns.collectes + ['Arbre de Noël'] %}
+        {% if address_prefix in entity.entity_id and 'arbre_de_noel' in entity.entity_id and state_attr(entity.entity_id, 'jours_restants') == days_before_var %}
+          {% set ns.autres = ns.autres + ['Arbre de Noël'] %}
         {% endif %}
       {% endfor %}
     {% endif %}
     
-    {{ ns.collectes }}
+    {{ {'bacs': ns.bacs, 'autres': ns.autres} }}
   
   items_text: >
-    {% set items = collectes_list %}
-    {% if items | length == 1 %}
-      {{ items[0] }}
-    {% elif items | length == 2 %}
-      {{ items[0] }} et {{ items[1] }}
+    {% set bacs = collectes_list.bacs %}
+    {% set autres = collectes_list.autres %}
+    {% set parts = [] %}
+    
+    {# Formatter les bacs #}
+    {% if bacs | length == 1 %}
+      {% set parts = parts + ['le bac à ' + bacs[0]] %}
+    {% elif bacs | length == 2 %}
+      {% set parts = parts + ['le bac à ' + bacs[0] + ' et le bac à ' + bacs[1]] %}
+    {% elif bacs | length == 3 %}
+      {% set parts = parts + ['le bac à ' + bacs[0] + ', le bac à ' + bacs[1] + ' et le bac à ' + bacs[2]] %}
+    {% endif %}
+    
+    {# Formatter les autres items #}
+    {% if autres | length == 1 %}
+      {% set parts = parts + ['les ' + autres[0]] %}
+    {% elif autres | length == 2 %}
+      {% set parts = parts + ['les ' + autres[0] + ' et les ' + autres[1]] %}
+    {% elif autres | length == 3 %}
+      {% set parts = parts + ['les ' + autres[0] + ', les ' + autres[1] + ' et les ' + autres[2]] %}
+    {% endif %}
+    
+    {# Combiner tout #}
+    {% if parts | length == 1 %}
+      {{ parts[0] }}
+    {% elif parts | length == 2 %}
+      {{ parts[0] + ' et ' + parts[1] }}
     {% else %}
-      {{ items[:-1] | join(', ') }} et {{ items[-1] }}
+      {{ parts | join(', ') }}
     {% endif %}
   
-  pluriel: "{{ 's' if collectes_list | length > 1 else '' }}"
-  
   message: >
-    N'oublie pas de mettre le{{ pluriel }} "{{ items_text }}" au chemin pour {{ day_text }} !
+    N'oublie pas de mettre {{ items_text }} au chemin pour {{ day_text }} !
 
 trigger:
   - platform: time
@@ -168,7 +202,7 @@ trigger:
 
 condition:
   - condition: template
-    value_template: "{{ collectes_list | length > 0 }}"
+    value_template: "{{ collectes_list.bacs | length > 0 or collectes_list.autres | length > 0 }}"
 
 action:
   - repeat:
