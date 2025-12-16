@@ -1,5 +1,5 @@
 blueprint:
-  name: Notification de Collecte RN-Collectes
+  name: Notification de Collecte Rouyn-Noranda
   description: >
     Envoie une notification personnalisée pour rappeler les collectes à venir.
     Le message s'adapte automatiquement selon le nombre de jours avant la collecte

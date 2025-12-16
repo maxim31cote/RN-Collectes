@@ -1,4 +1,4 @@
-# RN-Collectes - Intégration Home Assistant
+# Collectes Rouyn-Noranda - Intégration Home Assistant
 
 Cette intégration permet de suivre les collectes de déchets, récupération, compost, encombrants et résidus verts de la Ville de Rouyn-Noranda.
 
