@@ -1,9 +1,0 @@
-{
-  "domain": "rn_collectes",
-  "name": "Collectes Rouyn-Noranda",
-  "integrations": {
-    "rn_collectes": {
-      "name": "Collectes Rouyn-Noranda"
-    }
-  }
-}
